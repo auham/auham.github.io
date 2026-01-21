@@ -1,7 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts"
 
 const ONESIGNAL_APP_ID = '33461894-4470-4dd2-b2c3-222591f4ca88'
-const ONESIGNAL_REST_API_KEY = 'os_v2_app_gndbrfceobg5fmwdeiszd5gkrddrb5ebr47e7deqpfygkjrtteav7cxshnmgax7p2pspzd73iczxpy4phg5y7zqzepiskv4h2dprd5a'
+const ONESIGNAL_REST_API_KEY = 'os_v2_app_gndbrfceobg5fmwdeiszd5gkrdxrj2yckbqu3j5eze33qh53anwdftux7fesoh4ewayoyp2idc7ogk4ce5ufhkbrwpmvwlx5rwnqs6i'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
