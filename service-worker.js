@@ -1,4 +1,4 @@
-const CACHE_NAME = 'almurabait-v4';
+const CACHE_NAME = 'almurabait-v5';
 const urlsToCache = [
   './',
   './index.html',
@@ -101,4 +101,5 @@ self.addEventListener('notificationclick', event => {
     );
   }
 });
+
 
