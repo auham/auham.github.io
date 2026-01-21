@@ -374,11 +374,43 @@
                 await createNews(newsItem);
                 e.target.reset();
                 loadNewsList();
+
+                // إرسال إشعار فوري لجميع المستخدمين
+                await sendNewsNotification(newsItem.title);
+
                 showToast('تمت إضافة الخبر بنجاح ✅', 'success');
             } catch (error) {
                 showToast('حدث خطأ في الإضافة ❌', 'error');
             }
         });
+
+        // دالة إرسال إشعار الأخبار
+        async function sendNewsNotification(newsTitle) {
+            try {
+                const response = await fetch('https://onesignal.com/api/v1/notifications', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Basic os_v2_app_gndbrfceobg5fmwdeiszd5gkrddrb5ebr47e7deqpfygkjrtteav7cxshnmgax7p2pspzd73iczxpy4phg5y7zqzepiskv4h2dprd5a'
+                    },
+                    body: JSON.stringify({
+                        app_id: '33461894-4470-4dd2-b2c3-222591f4ca88',
+                        included_segments: ['All'],
+                        headings: { ar: '📰 خبر جديد', en: 'New News' },
+                        contents: { ar: newsTitle, en: newsTitle },
+                        url: 'https://auham.github.io/news.html',
+                        chrome_web_icon: 'https://auham.github.io/icons/icon-192.png'
+                    })
+                });
+
+                const result = await response.json();
+                console.log('Notification sent:', result);
+                return response.ok;
+            } catch (error) {
+                console.error('Failed to send notification:', error);
+                return false;
+            }
+        }
 
         async function handleDeleteNews(id) {
             if (!confirm('هل أنت متأكد من حذف هذا الخبر؟')) return;
