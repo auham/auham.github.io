@@ -98,6 +98,27 @@
             navigator.serviceWorker.register('service-worker.js');
         }
 
+        // Force open link in external browser (Safari on iOS)
+        function openExternal(url) {
+            // Check if running as PWA on iOS
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const isStandalone = window.navigator.standalone === true;
+
+            if (isIOS && isStandalone) {
+                // Create a temporary link and trigger it
+                const link = document.createElement('a');
+                link.href = url;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } else {
+                // For non-PWA or Android, use window.open
+                window.open(url, '_blank', 'noopener,noreferrer');
+            }
+        }
+
         // Load news on page load
         document.addEventListener('DOMContentLoaded', loadNews);
 
@@ -146,10 +167,10 @@
             <span>${formattedDate}</span>
           </div>
           ${item.url ? `
-            <a href="${item.url}" target="_blank" rel="external noopener" class="btn btn-secondary btn-link" style="margin-top: 1rem;">
+            <button onclick="openExternal('${item.url}')" class="btn btn-secondary btn-link" style="margin-top: 1rem;">
               <span>🔗</span>
               <span>اقرأ المزيد</span>
-            </a>
+            </button>
           ` : ''}
         </article>
       `;
