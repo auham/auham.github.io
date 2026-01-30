@@ -1243,3 +1243,17 @@ body {
   padding: 0 1.5rem 1.5rem;
   white-space: pre-wrap;
 }
+
+/* Date Display Styling */
+.date-hijri {
+  color: var(--gold);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.date-gregorian {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
