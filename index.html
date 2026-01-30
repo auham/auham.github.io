@@ -113,6 +113,20 @@
       </div>
     </div>
 
+    <!-- Notification Banner -->
+    <div class="notification-banner" id="notificationBanner">
+      <button class="install-close" onclick="closeNotificationBanner()">✕</button>
+      <div class="install-banner-content">
+        <h3>🔔 تفعيل الإشعارات</h3>
+        <p>احصل على تنبيهات فورية للدعوات والأخبار الجديدة</p>
+        <button class="btn btn-primary" id="enableNotificationsBtn" onclick="requestNotificationPermission()">
+          <span>🔔</span>
+          <span>تفعيل الإشعارات</span>
+        </button>
+      </div>
+    </div>
+
+
     <!-- Invitations Section -->
     <section class="section">
       <div class="section-title">
@@ -188,6 +202,75 @@
       document.getElementById('installBanner').style.display = 'none';
       localStorage.setItem('installBannerDismissed', 'true');
     }
+
+    function closeNotificationBanner() {
+      document.getElementById('notificationBanner').style.display = 'none';
+      localStorage.setItem('notificationBannerDismissed', 'true');
+    }
+
+    async function requestNotificationPermission() {
+      try {
+        // Use OneSignal to request permission
+        if (window.OneSignal) {
+          await OneSignal.Slidedown.promptPush();
+          // Hide banner after request
+          closeNotificationBanner();
+        } else {
+          // Fallback for native Notification API
+          const permission = await Notification.requestPermission();
+          if (permission === 'granted') {
+            closeNotificationBanner();
+            showToast('تم تفعيل الإشعارات بنجاح! 🔔');
+          }
+        }
+      } catch (error) {
+        console.error('Notification permission error:', error);
+        showToast('حدث خطأ، حاول مرة أخرى');
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // Check notification permission and show banner
+    async function checkNotificationStatus() {
+      const banner = document.getElementById('notificationBanner');
+      const dismissed = localStorage.getItem('notificationBannerDismissed');
+
+      if (dismissed) {
+        banner.style.display = 'none';
+        return;
+      }
+
+      // Check if already subscribed via OneSignal
+      try {
+        if (window.OneSignal) {
+          const isSubscribed = await OneSignal.User.PushSubscription.optedIn;
+          if (isSubscribed) {
+            banner.style.display = 'none';
+            return;
+          }
+        } else if (Notification.permission === 'granted') {
+          banner.style.display = 'none';
+          return;
+        }
+      } catch (e) {
+        console.log('Checking notification status:', e);
+      }
+
+      // Show banner for non-subscribed users
+      banner.style.display = 'block';
+    }
+
+    // Initialize notification check after page load
+    window.addEventListener('load', () => {
+      setTimeout(checkNotificationStatus, 2000);
+    });
 
     // Load invitations on page load
     document.addEventListener('DOMContentLoaded', loadInvitations);
