@@ -1,4 +1,4 @@
-const CACHE_NAME = 'almurabait-v8';
+const CACHE_NAME = 'almurabait-v9';
 const urlsToCache = [
   './',
   './index.html',
@@ -70,25 +70,59 @@ self.addEventListener('fetch', event => {
 
 // Push notification event
 self.addEventListener('push', event => {
+  let notificationData = {
+    title: 'دعوات المريبيط',
+    body: 'إشعار جديد',
+    url: './'
+  };
+
+  // Try to parse the push data
+  if (event.data) {
+    try {
+      const data = event.data.json();
+      // OneSignal sends data in specific format
+      if (data.title) {
+        notificationData.title = data.title;
+      }
+      if (data.alert) {
+        notificationData.body = data.alert;
+      } else if (data.body) {
+        notificationData.body = data.body;
+      } else if (data.message) {
+        notificationData.body = data.message;
+      }
+      if (data.custom && data.custom.u) {
+        notificationData.url = data.custom.u;
+      } else if (data.url) {
+        notificationData.url = data.url;
+      }
+    } catch (e) {
+      // If not JSON, use as plain text
+      notificationData.body = event.data.text();
+    }
+  }
+
   const options = {
-    body: event.data ? event.data.text() : 'إشعار جديد من المريبيط',
+    body: notificationData.body,
     icon: './icons/icon-192.png',
-    badge: './icons/icon-192.png',
+    badge: './icons/icon-72.png',
     vibrate: [100, 50, 100],
     dir: 'rtl',
     lang: 'ar',
+    tag: 'almurabait-notification',
+    renotify: true,
     data: {
-      dateOfArrival: Date.now(),
-      primaryKey: 1
+      url: notificationData.url,
+      dateOfArrival: Date.now()
     },
     actions: [
-      { action: 'open', title: 'فتح التطبيق' },
+      { action: 'open', title: 'فتح' },
       { action: 'close', title: 'إغلاق' }
     ]
   };
 
   event.waitUntil(
-    self.registration.showNotification('دعوات المريبيط', options)
+    self.registration.showNotification(notificationData.title, options)
   );
 });
 
