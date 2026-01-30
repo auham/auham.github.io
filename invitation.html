@@ -218,26 +218,28 @@
             // Date - format both Hijri and Gregorian
             const date = new Date(invitation.wedding_date);
 
-            // Hijri date
-            const hijriDate = date.toLocaleDateString('ar-SA', {
+            // Hijri date (force Islamic calendar)
+            const hijriFormatter = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
             });
+            const hijriDate = hijriFormatter.format(date);
 
-            // Gregorian date
-            const gregorianDate = date.toLocaleDateString('ar-EG', {
+            // Gregorian date (force Gregorian calendar)
+            const gregorianFormatter = new Intl.DateTimeFormat('ar-SA-u-ca-gregory', {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
             });
+            const gregorianDate = gregorianFormatter.format(date);
 
             // Display both dates
             document.getElementById('weddingDate').innerHTML = `
-                <div class="date-hijri">${hijriDate}</div>
-                <div class="date-gregorian">${gregorianDate}</div>
+                <div class="date-hijri">🌙 ${hijriDate}</div>
+                <div class="date-gregorian">📆 ${gregorianDate}</div>
             `;
 
             // Time
