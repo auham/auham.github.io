@@ -1,4 +1,4 @@
-const CACHE_NAME = 'almurabait-v12';
+const CACHE_NAME = 'almurabait-v13';
 const urlsToCache = [
   './',
   './index.html',

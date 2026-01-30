@@ -88,6 +88,14 @@
         </div>
     </nav>
 
+    <!-- News Detail Modal -->
+    <div class="modal-overlay" id="newsModal" onclick="closeNewsModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeNewsModal()">&times;</button>
+            <div id="modalNewsContent"></div>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
     <div class="toast" id="toast"></div>
 
@@ -159,23 +167,63 @@
                 day: 'numeric'
             });
 
+            // Escape JSON for onclick
+            const itemData = encodeURIComponent(JSON.stringify(item));
+
             return `
-        <article class="news-card">
+        <article class="news-card" onclick="openNewsDetail('${itemData}')" style="cursor: pointer;">
           ${item.image_url ? `<img src="${item.image_url}" alt="${item.title}" class="news-image">` : ''}
           <h3>${item.title}</h3>
-          <p>${item.content || ''}</p>
+          <p class="news-preview">${(item.content || '').substring(0, 100)}${item.content && item.content.length > 100 ? '...' : ''}</p>
           <div class="news-date">
             <span>📅</span>
             <span>${formattedDate}</span>
           </div>
-          ${item.url ? `
-            <button onclick="openExternal('${item.url}')" class="btn btn-secondary btn-link" style="margin-top: 1rem;">
-              <span>�</span>
-              <span>انسخ الرابط</span>
-            </button>
-          ` : ''}
+          <div class="news-tap-hint">اضغط لعرض التفاصيل</div>
         </article>
       `;
+        }
+
+        // Store current news item for modal
+        let currentNewsItem = null;
+
+        function openNewsDetail(itemData) {
+            const item = JSON.parse(decodeURIComponent(itemData));
+            currentNewsItem = item;
+
+            const date = new Date(item.created_at);
+            const formattedDate = date.toLocaleDateString('ar-SA', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            const modalContent = document.getElementById('modalNewsContent');
+            modalContent.innerHTML = `
+                ${item.image_url ? `<img src="${item.image_url}" alt="${item.title}" class="modal-news-image">` : ''}
+                <h2 class="modal-news-title">${item.title}</h2>
+                <div class="modal-news-date">
+                    <span>📅</span>
+                    <span>${formattedDate}</span>
+                </div>
+                <div class="modal-news-content">${item.content || ''}</div>
+                ${item.url ? `
+                    <button onclick="openExternal('${item.url}')" class="btn btn-primary" style="margin-top: 1.5rem; width: 100%;">
+                        <span>📋</span>
+                        <span>انسخ الرابط</span>
+                    </button>
+                ` : ''}
+            `;
+
+            document.getElementById('newsModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeNewsModal(event) {
+            if (event && event.target !== document.getElementById('newsModal')) return;
+            document.getElementById('newsModal').classList.remove('active');
+            document.body.style.overflow = '';
+            currentNewsItem = null;
         }
     </script>
 </body>
